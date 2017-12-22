@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Monitriip</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">CPF</string>
+    <string name="prompt_placa">PLACA</string>
+    <string name="prompt_password">Senha</string>
+    <string name="action_sign_in">Entrar</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">CPF inválido</string>
+    <string name="error_invalid_password">Senha muito curta</string>
+    <string name="error_incorrect_password">CPF, Placa ou senha inválidos</string>
+    <string name="error_field_required">Campo obrigatório</string>
+    <string name="hintAutorizacaoViagem">Informe o código de autorização da viagem</string>
+    <string name="cpf_stored">CPF</string>
+    <string name="placa_stored">Placa</string>
+    <string name="senha_stored">Senha</string>
+</resources>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="concept.monitriip.activity.MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tvPlacaVeiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Placa: PIS-1650"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <TextView
+            android:id="@+id/tvNomeMotorista"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Motorista: Antonio das Neves"
+            android:textAlignment="center"
+            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="35dp" />
+
+        <Button
+            android:id="@+id/btn_iniciar_jornada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Jornada" />
+
+        <Button
+            android:id="@+id/btn_finalizar_jornada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Jornada" />
+
+        <Button
+            android:id="@+id/btn_informar_jornada_andamento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Informar Jornada em Andamento" />
+
+        <Button
+            android:id="@+id/btn_registrar_parada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Registrar Parada" />
+
+        <Button
+            android:id="@+id/btn_iniciar_viagem_fretado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Viagem Fretado" />
+
+        <Button
+            android:id="@+id/btn_finalizar_viagem_fretado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Viagem Fretado" />
+
+        <Button
+            android:id="@+id/btn_iniciar_viagem_fretado_com_tramsbordo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Viagem Fretado com Transbordo" />
+
+        <Button
+            android:id="@+id/btn_finalizar_viagem_fretado_com_transbordo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Viagem Fretado com Transbordo" />
+
+        <Button
+            android:id="@+id/btn_sair"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            style="?android:attr/borderlessButtonStyle"
+            android:text="SAIR" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

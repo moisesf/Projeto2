@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/autorizacaoViagem"
+        android:inputType="textEmailAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:hint="@string/hintAutorizacaoViagem" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Informe o sentido da viagem:"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <RadioButton
+            android:id="@+id/rbSentidoViagemIda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ida" />
+        <RadioButton
+            android:id="@+id/rbSentidoViagemVolta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volta" />
+    </RadioGroup>
+</LinearLayout>
