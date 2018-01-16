@@ -1,6 +1,5 @@
 package concept.monitriip.fachada;
 
-import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -16,11 +15,8 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import concept.monitriip.vo.EventoVO;
@@ -82,13 +78,13 @@ public class HttpFachada implements NetworkManager.NetworkHandler {
         this.isOnline = isOnline;
     }
     @SuppressWarnings("deprecation")
-    private void atualizacoesEmBackground() {
+    public void atualizacoesEmBackground() {
         ArrayList<EventoVO> listaOffline = dbHelper.selectEventos();
         if (listaOffline != null) {
             String resultadoAlteracao = null;
             for (EventoVO vo : listaOffline) {
                 try {
-                    resultadoAlteracao = incluirEventoONLINE(vo);
+                    resultadoAlteracao = enviarEventoParaPlataforma(vo);
                     if (resultadoAlteracao != null && resultadoAlteracao.toLowerCase().indexOf("sucesso") != -1) {
                         dbHelper.deleteEvento(vo);
                     } else {
@@ -102,27 +98,10 @@ public class HttpFachada implements NetworkManager.NetworkHandler {
         }
     }
 
-    private String incluirEventoDB(EventoVO vo) {
-        try {
-            switch (vo.getOperacao()) {
-                case InserirLogDetectorParada:
-                     dbHelper.inserirLogDetectorParadaVO(vo);
-                case InserirLogJornadaTrabalhoMotorista:
-                    dbHelper.inserirLogJornadaTrabalhoMotoristaVO(vo);
-                case InserirLogInicioFimViagemFretado:
-                    dbHelper.inserirLogInicioFimViagemFretadoVO(vo);
-                case InserirLogInicioFimViagemRegular:
-                    dbHelper.inserirLogInicioFimViagemRegularVO(vo);
-            }
-            return "Evento incluído com sucesso.";
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
 
     @SuppressWarnings("deprecation")
-    private String incluirEventoONLINE(EventoVO evento) throws HttpHostConnectException {
+    private String enviarEventoParaPlataforma(EventoVO evento) throws HttpHostConnectException {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(Constantes.ENDERECO_SERVIDOR + "/IncluirEventoMonitriip");
 
@@ -137,10 +116,14 @@ public class HttpFachada implements NetworkManager.NetworkHandler {
         nameValuePair.add(new BasicNameValuePair("pdop",evento.getPdop()));
         nameValuePair.add(new BasicNameValuePair("motivoParada", evento.getMotivoParada()));
         nameValuePair.add(new BasicNameValuePair("autorizacaoViagem", evento.getAutorizacaoViagem()));
-        nameValuePair.add(new BasicNameValuePair("tipoRegistroViagem", evento.getTipoRegistroViagem()));
+        if (evento.getTipoRegistroViagem() != null) {
+            nameValuePair.add(new BasicNameValuePair("tipoRegistroViagem", evento.getTipoRegistroViagem().getCod()));
+        }
         nameValuePair.add(new BasicNameValuePair("sentidoLinha", evento.getSentidoLinha()));
         nameValuePair.add(new BasicNameValuePair("cpfMotorista", evento.getCpfMotorista()));
-        nameValuePair.add(new BasicNameValuePair("tipoRegistroEvento", evento.getTipoRegistroEvento().getCod()));
+        if (evento.getTipoRegistroEvento() != null) {
+            nameValuePair.add(new BasicNameValuePair("tipoRegistroEvento", evento.getTipoRegistroEvento().getCod()));
+        }
         nameValuePair.add(new BasicNameValuePair("identificaoLinha", evento.getIdentificaoLinha()));
         nameValuePair.add(new BasicNameValuePair("codigoTipoViagem", evento.getCodigoTipoViagem()));
         nameValuePair.add(new BasicNameValuePair("dataProgramadaViagem", evento.getDataProgramadaViagem()));

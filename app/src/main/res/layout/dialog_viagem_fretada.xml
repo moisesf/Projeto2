@@ -22,14 +22,17 @@
         android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rgSentidoViagem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <RadioButton
             android:id="@+id/rbSentidoViagemIda"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Ida" />
+
         <RadioButton
             android:id="@+id/rbSentidoViagemVolta"
             android:layout_width="match_parent"

@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="Placa: PIS-1650"
             android:textAlignment="center"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textSize="30sp"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="16dp" />
 
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:text="Motorista: Antonio das Neves"
             android:textAlignment="center"
-            android:textAppearance="@android:style/TextAppearance.Material.Medium"
+            android:textSize="24sp"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="35dp" />
 

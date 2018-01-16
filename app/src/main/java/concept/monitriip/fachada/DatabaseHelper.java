@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import concept.monitriip.vo.EventoVO;
 import concept.monitriip.vo.OperacaoMonitriip;
 import concept.monitriip.vo.TipoRegistroEvento;
+import concept.monitriip.vo.TipoRegistroViagem;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -121,7 +122,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("longitude",evento.getLongitude());
         values.put("pdop",evento.getPdop());
         values.put("autorizacaoViagem", evento.getAutorizacaoViagem());
-        values.put("tipoRegistroViagem", evento.getTipoRegistroViagem());
+        values.put("tipoRegistroViagem", evento.getTipoRegistroViagem().getCod());
         values.put("sentidoLinha", evento.getSentidoLinha());
         db.insertOrThrow("Evento", null, values);
     }
@@ -178,10 +179,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     vo.setPdop(cursor.getString(cursor.getColumnIndex("pdop")));
                     vo.setMotivoParada(cursor.getString(cursor.getColumnIndex("motivoParada")));
                     vo.setAutorizacaoViagem(cursor.getString(cursor.getColumnIndex("autorizacaoViagem")));
-                    vo.setTipoRegistroViagem(cursor.getString(cursor.getColumnIndex("tipoRegistroViagem")));
+                    if (cursor.getString(cursor.getColumnIndex("tipoRegistroViagem")) != null) {
+                        vo.setTipoRegistroViagem(TipoRegistroViagem.getByCod(cursor.getString(cursor.getColumnIndex("tipoRegistroViagem"))));
+                    }
                     vo.setSentidoLinha(cursor.getString(cursor.getColumnIndex("sentidoLinha")));
                     vo.setCpfMotorista(cursor.getString(cursor.getColumnIndex("cpfMotorista")));
-                    vo.setTipoRegistroEvento(TipoRegistroEvento.valueOf(cursor.getString(cursor.getColumnIndex("tipoRegistroEvento"))));
+                    if (cursor.getString(cursor.getColumnIndex("tipoRegistroEvento")) != null) {
+                        vo.setTipoRegistroEvento(TipoRegistroEvento.getByCod(cursor.getString(cursor.getColumnIndex("tipoRegistroEvento"))));
+                    }
                     vo.setIdentificaoLinha(cursor.getString(cursor.getColumnIndex("identificaoLinha")));
                     vo.setCodigoTipoViagem(cursor.getString(cursor.getColumnIndex("codigoTipoViagem")));
                     vo.setDataProgramadaViagem(cursor.getString(cursor.getColumnIndex("dataProgramadaViagem")));

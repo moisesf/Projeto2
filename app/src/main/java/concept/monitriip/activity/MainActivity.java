@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
@@ -16,8 +17,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import concept.monitriip.R;
 import concept.monitriip.fachada.DatabaseHelper;
@@ -27,6 +33,7 @@ import concept.monitriip.fachada.MonitriipFachada;
 import concept.monitriip.fachada.PositionProvider;
 import concept.monitriip.fachada.TrackingController;
 import concept.monitriip.vo.TipoRegistroEvento;
+import concept.monitriip.vo.TipoRegistroViagem;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,9 +58,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLabelNomeMotorista;
     private TextView mLabelPlacaVeiculo;
     private MonitriipFachada fachada;
+    private HttpFachada fachadaHttp;
     private TelephonyManager telephonyManager;
     private static String IMEI;
     private TrackingController trackingController;
+    private AtualizadorTask mEnviarAtualizacoesTask;
+    private Timer myTimer;
 
     public static String getIMEI(){
         return IMEI;
@@ -84,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         fachada = new MonitriipFachada(this );
+        fachadaHttp = new HttpFachada(this);
         setContentView(R.layout.activity_main);
         Intent intent = getIntent();
         idCliente = intent.getIntExtra(LoginActivity.ID_CLIENTE,0);
@@ -93,10 +104,10 @@ public class MainActivity extends AppCompatActivity {
         cpf = intent.getStringExtra(LoginActivity.CPF);
 
         mLabelNomeMotorista = (TextView) findViewById(R.id.tvNomeMotorista);
-        mLabelNomeMotorista.setText("Motorista:" + nomeMotorista);
+        mLabelNomeMotorista.setText(nomeMotorista);
 
         mLabelPlacaVeiculo = (TextView) findViewById(R.id.tvPlacaVeiculo);
-        mLabelPlacaVeiculo.setText("Placa:" + placaVeiculo);
+        mLabelPlacaVeiculo.setText(placaVeiculo);
         setIMEI();
         trackingController = new TrackingController(this);
         trackingController.start();
@@ -169,19 +180,40 @@ public class MainActivity extends AppCompatActivity {
 
         btnIniciarViagemFretado = (Button) findViewById(R.id.btn_iniciar_viagem_fretado);
         btnIniciarViagemFretado.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            public void onClick(final View v) {
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 
-                builder.setView(inflater.inflate(R.layout.dialog_viagem_fretada, null));
+                final View view = inflater.inflate(R.layout.dialog_viagem_fretada, null);
+                builder.setView(view);
                 builder.setPositiveButton("Gravar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Validar os campos
-                        btnIniciarViagemFretado.setVisibility(View.GONE);
-                        btnFinalizarViagemFretado.setVisibility(View.VISIBLE);
-                        btnIniciarViagemFretadoComTransbordo.setVisibility(View.GONE);
-                        btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                        if (trackingController.getLastPosition() != null) {
+
+                            EditText etAutorizacao = (EditText) view.findViewById(R.id.autorizacaoViagem);
+                            if (etAutorizacao.getText() == null) {
+                                Toast.makeText(v.getContext(), "Código Autorização da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            RadioGroup rg = (RadioGroup) view.findViewById(R.id.rgSentidoViagem);
+                            int radioButtonID = rg.getCheckedRadioButtonId();
+                            if (radioButtonID < 0) {
+                                Toast.makeText(v.getContext(), "Sentido da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            String sentido = (radioButtonID == 0 ? "1" : "0");
+
+                            fachada.inserirLogInicioFimViagemFretadoVO(idVeiculo, IMEI, trackingController.getLastPosition(), TipoRegistroViagem.INICIO, etAutorizacao.getText().toString(), sentido);
+
+                            btnIniciarViagemFretado.setVisibility(View.GONE);
+                            btnFinalizarViagemFretado.setVisibility(View.VISIBLE);
+                            btnIniciarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                            btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                        } else {
+                            Toast.makeText(v.getContext(), "Aguarde o GPS inicializar", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
                 builder.setNegativeButton("Voltar", new DialogInterface.OnClickListener() {
@@ -196,31 +228,91 @@ public class MainActivity extends AppCompatActivity {
 
         btnFinalizarViagemFretado = (Button) findViewById(R.id.btn_finalizar_viagem_fretado);
         btnFinalizarViagemFretado.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                btnIniciarViagemFretado.setVisibility(View.VISIBLE);
-                btnFinalizarViagemFretado.setVisibility(View.GONE);
-                btnIniciarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
-                btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+            public void onClick(final View v) {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+                final View view = inflater.inflate(R.layout.dialog_viagem_fretada, null);
+                builder.setView(view);
+                builder.setPositiveButton("Gravar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Validar os campos
+                        if (trackingController.getLastPosition() != null) {
+
+                            EditText etAutorizacao = (EditText) view.findViewById(R.id.autorizacaoViagem);
+                            if (etAutorizacao.getText() == null) {
+                                Toast.makeText(v.getContext(), "Código Autorização da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            RadioGroup rg = (RadioGroup) view.findViewById(R.id.rgSentidoViagem);
+                            int radioButtonID = rg.getCheckedRadioButtonId();
+                            if (radioButtonID < 0) {
+                                Toast.makeText(v.getContext(), "Sentido da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            String sentido = (radioButtonID == 0 ? "1" : "0");
+
+                            fachada.inserirLogInicioFimViagemFretadoVO(idVeiculo, IMEI, trackingController.getLastPosition(), TipoRegistroViagem.FIM, etAutorizacao.getText().toString(), sentido);
+
+                            btnIniciarViagemFretado.setVisibility(View.VISIBLE);
+                            btnFinalizarViagemFretado.setVisibility(View.GONE);
+                            btnIniciarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
+                            btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                        } else {
+                            Toast.makeText(v.getContext(), "Aguarde o GPS inicializar", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Voltar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //MainActivity.this.getDialog().cancel(); ???? O que fazer ?
+                    }
+                });
+
+                builder.show();
+
             }
         });
 
         btnIniciarViagemFretadoComTransbordo = (Button) findViewById(R.id.btn_iniciar_viagem_fretado_com_tramsbordo);
         btnIniciarViagemFretadoComTransbordo.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 
-                builder.setView(inflater.inflate(R.layout.dialog_viagem_fretada, null));
+                final View view = inflater.inflate(R.layout.dialog_viagem_fretada, null);
+                builder.setView(view);
                 builder.setPositiveButton("Gravar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
                         // Validar os campos
-                        btnIniciarViagemFretado.setVisibility(View.GONE);
-                        btnFinalizarViagemFretado.setVisibility(View.GONE);
-                        btnIniciarViagemFretadoComTransbordo.setVisibility(View.GONE);
-                        btnFinalizarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
+                        if (trackingController.getLastPosition() != null) {
+
+                            EditText etAutorizacao = (EditText) view.findViewById(R.id.autorizacaoViagem);
+                            if (etAutorizacao.getText() == null) {
+                                Toast.makeText(v.getContext(), "Código Autorização da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            RadioGroup rg = (RadioGroup) view.findViewById(R.id.rgSentidoViagem);
+                            int radioButtonID = rg.getCheckedRadioButtonId();
+                            if (radioButtonID < 0) {
+                                Toast.makeText(v.getContext(), "Sentido da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            String sentido = (radioButtonID == 0 ? "1" : "0");
+
+                            fachada.inserirLogInicioFimViagemFretadoVO(idVeiculo, IMEI, trackingController.getLastPosition(), TipoRegistroViagem.INICIO_COM_TRANSBORDO, etAutorizacao.getText().toString(), sentido);
+
+                            btnIniciarViagemFretado.setVisibility(View.GONE);
+                            btnFinalizarViagemFretado.setVisibility(View.GONE);
+                            btnIniciarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                            btnFinalizarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
+                        } else {
+                            Toast.makeText(v.getContext(), "Aguarde o GPS inicializar", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
                 builder.setNegativeButton("Voltar", new DialogInterface.OnClickListener() {
@@ -235,19 +327,61 @@ public class MainActivity extends AppCompatActivity {
 
         btnFinalizarViagemFretadoComTransbordo = (Button) findViewById(R.id.btn_finalizar_viagem_fretado_com_transbordo);
         btnFinalizarViagemFretadoComTransbordo.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                btnIniciarViagemFretado.setVisibility(View.VISIBLE);
-                btnFinalizarViagemFretado.setVisibility(View.GONE);
-                btnIniciarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
-                btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+            public void onClick(final View v) {
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+
+                final View view = inflater.inflate(R.layout.dialog_viagem_fretada, null);
+                builder.setView(view);
+                builder.setPositiveButton("Gravar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Validar os campos
+                        if (trackingController.getLastPosition() != null) {
+
+                            EditText etAutorizacao = (EditText) view.findViewById(R.id.autorizacaoViagem);
+                            if (etAutorizacao.getText() == null) {
+                                Toast.makeText(v.getContext(), "Código Autorização da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            RadioGroup rg = (RadioGroup) view.findViewById(R.id.rgSentidoViagem);
+                            int radioButtonID = rg.getCheckedRadioButtonId();
+                            if (radioButtonID < 0) {
+                                Toast.makeText(v.getContext(), "Sentido da Viagem obrigatório", Toast.LENGTH_LONG).show();
+                                return;
+                            }
+                            String sentido = (radioButtonID == 0 ? "1" : "0");
+
+                            fachada.inserirLogInicioFimViagemFretadoVO(idVeiculo, IMEI, trackingController.getLastPosition(), TipoRegistroViagem.FIM_COM_TRANSBORDO, etAutorizacao.getText().toString(), sentido);
+
+                            btnIniciarViagemFretado.setVisibility(View.VISIBLE);
+                            btnFinalizarViagemFretado.setVisibility(View.GONE);
+                            btnIniciarViagemFretadoComTransbordo.setVisibility(View.VISIBLE);
+                            btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+                        } else {
+                            Toast.makeText(v.getContext(), "Aguarde o GPS inicializar", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Voltar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //MainActivity.this.getDialog().cancel(); ???? O que fazer ?
+                    }
+                });
+
+                builder.show();
             }
         });
-
 
 
         btnSair = (Button) findViewById(R.id.btn_sair);
         btnSair.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if (myTimer != null) {
+                    myTimer.cancel();
+                }
+                fachadaHttp.stopNetworkManager();
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -261,7 +395,34 @@ public class MainActivity extends AppCompatActivity {
         btnFinalizarViagemFretado.setVisibility(View.GONE);
         btnIniciarViagemFretadoComTransbordo.setVisibility(View.GONE);
         btnFinalizarViagemFretadoComTransbordo.setVisibility(View.GONE);
+        ativarTimerDeAtualizacao();
+    }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ativarTimerDeAtualizacao();
+    }
+
+    private void ativarTimerDeAtualizacao(){
+        // Ativar o Timer para atualização periodica;
+        if (myTimer == null) {
+            myTimer = new Timer();
+        } else {
+            myTimer.cancel();
+            myTimer = null;
+            myTimer = new Timer();
+        }
+
+        if (mEnviarAtualizacoesTask == null) {
+            mEnviarAtualizacoesTask = new AtualizadorTask();
+        } else {
+            mEnviarAtualizacoesTask = null;
+            mEnviarAtualizacoesTask = new AtualizadorTask();
+        }
+
+        myTimer.scheduleAtFixedRate(mEnviarAtualizacoesTask, 10000, 15000);
     }
 
     @Override
@@ -271,4 +432,17 @@ public class MainActivity extends AppCompatActivity {
             trackingController.stop();
         }
     }
+
+    private class AtualizadorTask extends TimerTask {
+        @Override
+        public void run() {
+            runOnUiThread(new  Runnable() {
+                public void run() {
+                    fachadaHttp.atualizacoesEmBackground();
+                }
+            });
+        }
+    }
+
+
 }

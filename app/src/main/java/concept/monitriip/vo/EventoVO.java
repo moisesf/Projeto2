@@ -12,7 +12,7 @@ public class EventoVO {
     private String cpfMotorista;
     private String tipoEventoMonitriip;
     private String autorizacaoViagem;
-    private String tipoRegistroViagem;
+    private TipoRegistroViagem tipoRegistroViagem;
     private String motivoParada;
     private TipoRegistroEvento tipoRegistroEvento;
     private String sentidoLinha;
@@ -109,11 +109,11 @@ public class EventoVO {
         this.autorizacaoViagem = autorizacaoViagem;
     }
 
-    public String getTipoRegistroViagem() {
+    public TipoRegistroViagem getTipoRegistroViagem() {
         return tipoRegistroViagem;
     }
 
-    public void setTipoRegistroViagem(String tipoRegistroViagem) {
+    public void setTipoRegistroViagem(TipoRegistroViagem tipoRegistroViagem) {
         this.tipoRegistroViagem = tipoRegistroViagem;
     }
 

@@ -41,54 +41,21 @@ public class MixedPositionProvider extends PositionProvider implements LocationL
         lastFixTime = System.currentTimeMillis();
         locationManager.addGpsStatusListener(this);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, period, 0, this);
+        locationManager.addNmeaListener(this);
     }
 
     public void stopUpdates() {
         locationManager.removeUpdates(this);
         locationManager.removeGpsStatusListener(this);
-        stopBackupProvider();
+        locationManager.removeNmeaListener(this);
     }
 
-    private void startBackupProvider() {
-        Log.i(TAG, "backup provider start");
-        if (backupListener == null) {
 
-            backupListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    Log.i(TAG, "backup provider location");
-                    updateLocation(location, "2");
-                }
-
-                @Override
-                public void onStatusChanged(String s, int i, Bundle bundle) {
-                }
-
-                @Override
-                public void onProviderEnabled(String s) {
-                }
-
-                @Override
-                public void onProviderDisabled(String s) {
-                }
-            };
-
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, period, 0, backupListener);
-        }
-    }
-
-    private void stopBackupProvider() {
-        Log.i(TAG, "backup provider stop");
-        if (backupListener != null) {
-            locationManager.removeUpdates(backupListener);
-            backupListener = null;
-        }
-    }
 
     @Override
     public void onLocationChanged(Location location) {
         Log.i(TAG, "provider location");
-        stopBackupProvider();
+//        stopBackupProvider();
         lastFixTime = System.currentTimeMillis();
         updateLocation(location, pdop);
     }
@@ -100,20 +67,18 @@ public class MixedPositionProvider extends PositionProvider implements LocationL
     @Override
     public void onProviderEnabled(String provider) {
         Log.i(TAG, "provider enabled");
-        stopBackupProvider();
     }
 
     @Override
     public void onProviderDisabled(String provider) {
         Log.i(TAG, "provider disabled");
-        startBackupProvider();
         updateLocationLast();
     }
 
     @Override
     public void onGpsStatusChanged(int event) {
         if (backupListener == null && System.currentTimeMillis() - (lastFixTime + period) > FIX_TIMEOUT) {
-            startBackupProvider();
+//            startBackupProvider();
         }
     }
 

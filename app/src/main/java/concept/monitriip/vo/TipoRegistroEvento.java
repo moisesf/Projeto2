@@ -13,5 +13,14 @@ public enum TipoRegistroEvento {
         return this.codigo;
     }
 
+    public static TipoRegistroEvento getByCod(String pCodigo) {
+        switch (pCodigo) {
+            case "00": return FIM;
+            case "01": return INICIO;
+            case "02": return JORNADA;
+            default: return  INICIO;
+        }
+    }
+
 
 }

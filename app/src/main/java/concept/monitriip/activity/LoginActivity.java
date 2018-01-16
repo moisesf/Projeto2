@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -73,48 +74,51 @@ public class LoginActivity extends AppCompatActivity  {
     }
 
     private void verificarPermissoes() {
-        boolean checkPermission = true;
 
-        if (checkPermission) {
-            Set<String> missingPermissions = new HashSet<>();
-            if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-                missingPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-            if (!hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                missingPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
-            }
+        Set<String> missingPermissions = new HashSet<>();
+        if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            missingPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (!hasPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            missingPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
 
-            if (!hasPermission(Manifest.permission.READ_PHONE_STATE)) {
-                missingPermissions.add(Manifest.permission.READ_PHONE_STATE);
-            }
+        if (!hasPermission(Manifest.permission.READ_PHONE_STATE)) {
+            missingPermissions.add(Manifest.permission.READ_PHONE_STATE);
+        }
 
-            if (!hasPermission(Manifest.permission.INTERNET)) {
-                missingPermissions.add(Manifest.permission.INTERNET);
-            }
+        if (!hasPermission(Manifest.permission.INTERNET)) {
+            missingPermissions.add(Manifest.permission.INTERNET);
+        }
 
-            if (!hasPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
-                missingPermissions.add(Manifest.permission.ACCESS_NETWORK_STATE);
-            }
+        if (!hasPermission(Manifest.permission.ACCESS_NETWORK_STATE)) {
+            missingPermissions.add(Manifest.permission.ACCESS_NETWORK_STATE);
+        }
 
-            if (!hasPermission(Manifest.permission.ACCESS_WIFI_STATE)) {
-                missingPermissions.add(Manifest.permission.ACCESS_WIFI_STATE);
-            }
+        if (!hasPermission(Manifest.permission.ACCESS_WIFI_STATE)) {
+            missingPermissions.add(Manifest.permission.ACCESS_WIFI_STATE);
+        }
 
-            if (!hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                missingPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
+        if (!hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            missingPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
 
-            if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                missingPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
+        if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            missingPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
 
 
-            if (!missingPermissions.isEmpty()) {
-                if (Build.VERSION.SDK_INT >= 23) {
-                    requestPermissions(missingPermissions.toArray(new String[missingPermissions.size()]), PERMISSIONS_REQUEST_LOCATION);
-                }
-                return;
+        if (!missingPermissions.isEmpty()) {
+            if (Build.VERSION.SDK_INT >= 23) {
+                requestPermissions(missingPermissions.toArray(new String[missingPermissions.size()]), PERMISSIONS_REQUEST_LOCATION);
             }
+            return;
+        }
+
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
         }
 
 

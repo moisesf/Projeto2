@@ -7,6 +7,7 @@ import concept.monitriip.vo.EventoVO;
 import concept.monitriip.vo.OperacaoMonitriip;
 import concept.monitriip.vo.Position;
 import concept.monitriip.vo.TipoRegistroEvento;
+import concept.monitriip.vo.TipoRegistroViagem;
 
 
 public class MonitriipFachada {
@@ -45,5 +46,15 @@ public class MonitriipFachada {
         evento.setMotivoParada(String.valueOf(indiceTipoParada));
         fachadaDB.inserirLogDetectorParadaVO(evento);
         Log.d("Parada", "Inseriu  Parada " + indiceTipoParada);
+    }
+
+    public void inserirLogInicioFimViagemFretadoVO(int idVeiculo, String imei, Position posicao, TipoRegistroViagem tipoRegistroViagem, String autorizacao, String sentidoLinha) {
+        EventoVO evento = criarEventoBase(idVeiculo, imei, posicao);
+        evento.setOperacao(OperacaoMonitriip.InserirLogInicioFimViagemFretado);
+        evento.setAutorizacaoViagem(autorizacao);;
+        evento.setTipoRegistroViagem(tipoRegistroViagem);
+        evento.setSentidoLinha(sentidoLinha);
+        fachadaDB.inserirLogInicioFimViagemFretadoVO(evento);
+        Log.d("InicioFimViagemFretado", "Inseriu  " + tipoRegistroViagem.name());
     }
 }
