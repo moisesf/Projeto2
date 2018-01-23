@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <EditText
+        android:id="@+id/identificacaoLinha"
+        android:inputType="text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="4dp"
+        android:hint="@string/hintIdentificacaoLinha" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Viagem (0 - regular):"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    <EditText
+        android:id="@+id/etTipoViagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnPIckerDataProgramada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="showDatePickerDialog"
+        android:text="Escolha a data programada" />
+
+    <TextView
+        android:id="@+id/tvDataProgramadaViagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Data Programada:"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    <Button
+        android:id="@+id/btnHoraProgramada"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="showTimePickerDialog"
+        android:text="Escolha a Hora Programada" />
+
+    <TextView
+        android:id="@+id/tvHoraProgramdaViagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hora Programada:"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Informe o sentido da linha:"
+        android:textAlignment="center"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/rgSentidoViagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/rbSentidoViagemIda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ida" />
+
+        <RadioButton
+            android:id="@+id/rbSentidoViagemVolta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Volta" />
+    </RadioGroup>
+</LinearLayout>

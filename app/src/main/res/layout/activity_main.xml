@@ -57,6 +57,30 @@
             android:text="Registrar Parada" />
 
         <Button
+            android:id="@+id/btn_iniciar_viagem_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Viagem Regular" />
+
+        <Button
+            android:id="@+id/btn_finalizar_viagem_regular"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Viagem Regular" />
+
+        <Button
+            android:id="@+id/btn_iniciar_viagem_regular_com_tramsbordo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Iniciar Viagem Regular com Transbordo" />
+
+        <Button
+            android:id="@+id/btn_finalizar_viagem_regular_com_transbordo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Finalizar Viagem Regular com Transbordo" />
+
+        <Button
             android:id="@+id/btn_iniciar_viagem_fretado"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -87,6 +111,8 @@
             android:background="@color/colorPrimary"
             style="?android:attr/borderlessButtonStyle"
             android:text="SAIR" />
+
+
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

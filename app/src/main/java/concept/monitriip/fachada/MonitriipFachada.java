@@ -57,4 +57,17 @@ public class MonitriipFachada {
         fachadaDB.inserirLogInicioFimViagemFretadoVO(evento);
         Log.d("InicioFimViagemFretado", "Inseriu  " + tipoRegistroViagem.name());
     }
+
+    public void inserirLogInicioFimViagemRegularVO(int idVeiculo, String imei, Position posicao, TipoRegistroViagem tipoRegistroViagem, String identificacaoLinha, String codigoTipoViagem, String dataProgramadaViagem, String horaProgramadaViagem, String sentidoLinha) {
+        EventoVO evento = criarEventoBase(idVeiculo, imei, posicao);
+        evento.setOperacao(OperacaoMonitriip.InserirLogInicioFimViagemRegular);
+        evento.setIdentificaoLinha(identificacaoLinha);
+        evento.setCodigoTipoViagem(codigoTipoViagem);
+        evento.setDataProgramadaViagem(dataProgramadaViagem);
+        evento.setHoraProgramadaViagem(horaProgramadaViagem);
+        evento.setTipoRegistroViagem(tipoRegistroViagem);
+        evento.setSentidoLinha(sentidoLinha);
+        fachadaDB.inserirLogInicioFimViagemRegularVO(evento);
+        Log.d("InicioFimViagemRegular", "Inseriu  " + tipoRegistroViagem.name());
+    }
 }
